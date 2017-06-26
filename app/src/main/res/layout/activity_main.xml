@@ -24,6 +24,7 @@
             android:textSize="16sp" />
 
         <ImageView
+            android:id="@+id/btn_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -32,6 +33,7 @@
             android:src="@drawable/icon_search" />
 
         <ImageView
+            android:id="@+id/btn_add_friend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,6 +42,7 @@
             android:src="@drawable/icon_add" />
 
         <ImageView
+            android:id="@+id/btn_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

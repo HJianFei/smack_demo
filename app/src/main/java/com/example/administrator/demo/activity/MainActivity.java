@@ -1,5 +1,6 @@
 package com.example.administrator.demo.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.example.administrator.demo.R;
 import com.example.administrator.demo.fragment.ChartFragment;
@@ -15,6 +18,7 @@ import com.example.administrator.demo.fragment.FoundFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tlTabs;
     @BindView(R.id.vp_viewpager)
     ViewPager vpViewpager;
+    @BindView(R.id.btn_search)
+    ImageView btnSearch;
+    @BindView(R.id.btn_add_friend)
+    ImageView btnAddFriend;
+    @BindView(R.id.btn_menu)
+    ImageView btnMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +41,20 @@ public class MainActivity extends AppCompatActivity {
         vpViewpager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         tlTabs.setupWithViewPager(vpViewpager);
 
+    }
+
+    @OnClick({R.id.btn_search, R.id.btn_add_friend, R.id.btn_menu})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_search:
+                break;
+            case R.id.btn_add_friend:
+                Intent intent = new Intent(this, SearchActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_menu:
+                break;
+        }
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
