@@ -3,7 +3,9 @@ package com.example.administrator.demo.entity;
 
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 
-public class Friend {
+import java.io.Serializable;
+
+public class Friend implements Serializable {
     public String id;
     public String username;
     public RosterPacket.ItemStatus status; // 为null则不在线
@@ -19,6 +21,12 @@ public class Friend {
 
     public Friend(String username, RosterPacket.ItemType type) {
         super();
+        this.username = username;
+        this.type = type;
+    }
+
+    public Friend(String id, String username, RosterPacket.ItemType type) {
+        this.id = id;
         this.username = username;
         this.type = type;
     }

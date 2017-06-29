@@ -25,6 +25,7 @@
             android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
             android:text="james" />
     </LinearLayout>
 
@@ -58,6 +59,26 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="手机号码：" />
+
+        <TextView
+            android:id="@+id/user_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15107658882" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="邮箱：" />
 
         <TextView
@@ -69,9 +90,9 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btn_add_or_del"
+        android:id="@+id/btn_del"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="添加到通讯录" />
+        android:text="删除好友" />
 
 </LinearLayout>

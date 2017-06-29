@@ -2,6 +2,7 @@ package com.example.administrator.demo.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,12 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.administrator.demo.R;
+import com.example.administrator.demo.activity.FriendActivity;
 import com.example.administrator.demo.adapter.CommonAdapter;
+import com.example.administrator.demo.adapter.OnItemClickListener;
 import com.example.administrator.demo.adapter.ViewHolder;
+import com.example.administrator.demo.anyevent.UserEvent;
 import com.example.administrator.demo.entity.Friend;
 import com.example.administrator.demo.utils.ImgConfig;
 import com.example.administrator.demo.utils.XMPPConnUtils;
 import com.example.administrator.demo.utils.XMPPLoadThread;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,13 +86,14 @@ public class ContentFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         initData();
         initView();
+        EventBus.getDefault().register(this);
         return view;
     }
 
     private void initView() {
         adapter = new CommonAdapter<Friend>(mContext, R.layout.search_user_item_layout, friendList) {
             @Override
-            public void setData(ViewHolder holder, Friend friend) {
+            public void setData(ViewHolder holder, final Friend friend) {
                 holder.setText(R.id.user_name, friend.username);
                 Bitmap bitmap = ImgConfig.showHeadImg(friend.username);
                 if (bitmap == null) {
@@ -93,9 +101,24 @@ public class ContentFragment extends Fragment {
                 } else {
                     holder.setImageBitmap(R.id.user_avatar, bitmap);
                 }
+                holder.setOnClickListener(R.id.user_avatar, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, FriendActivity.class);
+                        intent.putExtra("user_name", friend.username);
+                        startActivity(intent);
+
+                    }
+                });
 
             }
         };
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(ViewGroup parent, View view, Object o, int position) {
+
+            }
+        });
         rvContent.setLayoutManager(new LinearLayoutManager(mContext));
         rvContent.setAdapter(adapter);
     }
@@ -120,9 +143,19 @@ public class ContentFragment extends Fragment {
         };
     }
 
+    @Subscribe
+    public void eventMessage(UserEvent userEvent) {
+
+        if (userEvent.flag == 1 || userEvent.flag == 2) {
+            initData();
+        }
+
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        EventBus.getDefault().unregister(this);
     }
 }

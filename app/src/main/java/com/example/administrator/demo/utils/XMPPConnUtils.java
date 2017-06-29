@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import com.example.administrator.demo.constants.Constants;
 import com.example.administrator.demo.entity.Friend;
+import com.example.administrator.demo.entity.User;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
@@ -13,7 +14,7 @@ import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smack.util.stringencoder.Base64;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.search.ReportedData;
 import org.jivesoftware.smackx.search.UserSearchManager;
@@ -21,11 +22,8 @@ import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.vcardtemp.provider.VCardProvider;
 import org.jivesoftware.smackx.xdata.Form;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -77,10 +75,13 @@ public class XMPPConnUtils {
         try {
             if (null == xmppConnection || !xmppConnection.isAuthenticated()) {
                 XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                        .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-                        .setHost(Constants.SERVER_HOST)
-                        .setPort(Constants.SERVER_PORT)
-                        .setServiceName(Constants.SERVER_NAME)
+                        .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)//越过证书
+                        .setSendPresence(true)// support presence
+//                        .setUsernameAndPassword("账号","密码") // 构建的时候先传入账号密码，当连接成功的时候会自动进行授权登录
+                        .setHost(Constants.SERVER_HOST)//IP地址
+                        .setPort(Constants.SERVER_PORT)//端口
+                        .setServiceName(Constants.SERVER_NAME)//域名
+                        .setDebuggerEnabled(true)//debug模式
                         .build();
                 xmppConnection = new XMPPTCPConnection(config);
                 xmppConnection.connect();
@@ -138,12 +139,14 @@ public class XMPPConnUtils {
         if (!getConnection().isAuthenticated() && getConnection().isConnected()) {
 
             try {
-                getConnection().login(account, password, "Smack");
+                getConnection().login(account, password, "Android");//多点登陆(设置第三个参数)
                 // // 更改在线状态
                 Presence presence = new Presence(Presence.Type.available);
                 presence.setMode(Presence.Mode.available);
                 getConnection().sendPacket(presence);
                 roster = Roster.getInstanceFor(getConnection());
+                roster.setSubscriptionMode(Roster.SubscriptionMode.manual);// 设置对方添加自己好友，需要询问
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -184,8 +187,9 @@ public class XMPPConnUtils {
      * @param key
      * @return
      */
-    public List<String> searchUser(String key) {
-        List<String> userList = new ArrayList<>();
+    public List<User> searchUser(String key) {
+        List<User> userList = new ArrayList<>();
+        User user;
         try {
             UserSearchManager search = new UserSearchManager(getConnection());
             Form searchForm = search.getSearchForm("search." + Constants.SERVER_NAME);
@@ -198,7 +202,12 @@ public class XMPPConnUtils {
             ReportedData data = search.getSearchResults(answerForm, "search." + Constants.SERVER_NAME);
             List<ReportedData.Row> rows = data.getRows();
             for (ReportedData.Row row : rows) {
-                userList.add(row.getValues("Username").toString());
+                String username = row.getValues("Username").toString();
+                String nickname = row.getValues("Name").toString();
+                String email = row.getValues("Email").toString();
+
+                user = new User(username.substring(1, username.length() - 1), nickname.substring(1, nickname.length() - 1), email.substring(1, email.length() - 1));
+                userList.add(user);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -350,8 +359,9 @@ public class XMPPConnUtils {
             // 加入这句代码，解决No VCard for
             ProviderManager.addIQProvider("vCard", "vcard-temp", new VCardProvider());
             byte[] bytes;
-            bytes = getFileBytes(file);
-            String encodedImage = StringUtils.encodeHex(bytes);
+            bytes = ImageUtil.getFileBytes(file);
+            //Base64加密
+            String encodedImage = Base64.encodeToString(bytes);
             vcard.setField("avatar", encodedImage);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             bitmap = FormatTools.getInstance().InputStream2Bitmap(bais);
@@ -359,7 +369,7 @@ public class XMPPConnUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LogUtil.d("onResponse",e.toString());
+            LogUtil.d("onResponse", e.toString());
 
         }
         return bitmap;
@@ -394,28 +404,5 @@ public class XMPPConnUtils {
         xmppConnection = null;
     }
 
-    /**
-     * 文件转字节
-     *
-     * @param file
-     * @return
-     * @throws IOException
-     */
-    private byte[] getFileBytes(File file) throws IOException {
-        BufferedInputStream bis = null;
-        try {
-            bis = new BufferedInputStream(new FileInputStream(file));
-            int bytes = (int) file.length();
-            byte[] buffer = new byte[bytes];
-            int readBytes = bis.read(buffer);
-            if (readBytes != buffer.length) {
-                throw new IOException("Entire file not read");
-            }
-            return buffer;
-        } finally {
-            if (bis != null) {
-                bis.close();
-            }
-        }
-    }
+
 }

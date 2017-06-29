@@ -53,6 +53,15 @@ public class CustomPopWindow extends PopupWindow {
                 context.startActivity(intent);
             }
         });
+        conentView.findViewById(R.id.menu_share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CustomPopWindow.this.dismiss();
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                context.startActivityForResult(intent, 1);
+            }
+        });
 
 
     }

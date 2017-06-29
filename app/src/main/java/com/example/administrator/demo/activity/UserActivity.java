@@ -2,7 +2,6 @@ package com.example.administrator.demo.activity;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,13 +11,9 @@ import android.widget.TextView;
 
 import com.example.administrator.demo.R;
 import com.example.administrator.demo.entity.Friend;
+import com.example.administrator.demo.entity.User;
 import com.example.administrator.demo.utils.ImgConfig;
 import com.example.administrator.demo.utils.XMPPConnUtils;
-import com.example.administrator.demo.utils.XMPPLoadThread;
-
-import org.jivesoftware.smackx.vcardtemp.packet.VCard;
-
-import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,48 +29,21 @@ public class UserActivity extends AppCompatActivity {
     TextView userName;
     @BindView(R.id.user_nickname)
     TextView userNickname;
-    @BindView(R.id.user_phone)
-    TextView userPhone;
     @BindView(R.id.user_email)
     TextView userEmail;
     @BindView(R.id.btn_add_or_del)
     Button btnAddOrDel;
-    private String user_name;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-        user_name = getIntent().getStringExtra("user_name");
+        user = (User) getIntent().getSerializableExtra("user");
         ButterKnife.bind(this);
-        //数据初始化
-        initData();
         //页面初始化
         initView();
-    }
 
-    /**
-     * 数据初始化
-     */
-    private void initData() {
-        new XMPPLoadThread(this) {
-
-            @Override
-            protected Object load() {
-                return XMPPConnUtils.getInstance().getUserInfo(user_name);
-            }
-
-            @Override
-            protected void result(Object object) {
-                VCard vCard = (VCard) object;
-                userName.setText(vCard.getField("Name"));
-                userNickname.setText(vCard.getField("nickName"));
-                userPhone.setText(vCard.getField("mobile"));
-                userEmail.setText(vCard.getField("email"));
-                userAvatar.setImageBitmap(ImgConfig.showHeadImg(user_name));
-
-            }
-        };
 
     }
 
@@ -93,11 +61,21 @@ public class UserActivity extends AppCompatActivity {
             }
         });
         //按钮的文字显示
-        if (isFriend(user_name)) {
+        if (isFriend(user.username)) {
             btnAddOrDel.setText("删除好友");
         } else {
             btnAddOrDel.setText("添加好友");
         }
+
+        Bitmap bitmap = ImgConfig.showHeadImg(user.username);
+        if (bitmap != null) {
+            userAvatar.setImageBitmap(bitmap);
+        } else {
+            userAvatar.setImageResource(R.drawable.default_avatar);
+        }
+        userName.setText(user.username);
+        userNickname.setText(user.nickname);
+        userEmail.setText(user.email);
     }
 
     /**
@@ -113,15 +91,20 @@ public class UserActivity extends AppCompatActivity {
     }
 
     //按钮点击事件
-    @OnClick(R.id.btn_add_or_del)
-    public void onViewClicked() {
-//        if (!isFriend(user_name)) {//添加好友
-//            XMPPConnUtils.getInstance().addUser(user_name);
-//        } else {//删除好友
-//            XMPPConnUtils.getInstance().delFriend(user_name);
-//        }
-        Bitmap bitmap = XMPPConnUtils.getInstance().changeImage(new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "bitmap.png"));
+    @OnClick({R.id.btn_add_or_del, R.id.user_avatar})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_add_or_del:
+                if (!isFriend(user.username)) {//添加好友
+                    XMPPConnUtils.getInstance().addUser(user.username);
+                } else {//删除好友
+                    XMPPConnUtils.getInstance().delFriend(user.username);
+                }
+                break;
+            case R.id.user_avatar:
 
+                break;
+        }
 
     }
 }

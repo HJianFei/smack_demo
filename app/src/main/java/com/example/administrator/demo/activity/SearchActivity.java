@@ -18,6 +18,7 @@ import com.example.administrator.demo.R;
 import com.example.administrator.demo.adapter.CommonAdapter;
 import com.example.administrator.demo.adapter.OnItemClickListener;
 import com.example.administrator.demo.adapter.ViewHolder;
+import com.example.administrator.demo.entity.User;
 import com.example.administrator.demo.utils.ImgConfig;
 import com.example.administrator.demo.utils.ToastUtils;
 import com.example.administrator.demo.utils.XMPPConnUtils;
@@ -42,8 +43,8 @@ public class SearchActivity extends AppCompatActivity {
     Button btnSearch;
     @BindView(R.id.re_search_result)
     RecyclerView reSearchResult;
-    private CommonAdapter<String> adapter;
-    private List<String> list = new ArrayList<>();
+    private CommonAdapter<User> adapter;
+    private List<User> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +67,13 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
         //设配器
-        adapter = new CommonAdapter<String>(this, R.layout.search_user_item_layout, list) {
+        adapter = new CommonAdapter<User>(this, R.layout.search_user_item_layout, list) {
             @Override
-            public void setData(ViewHolder holder, String s) {
+            public void setData(ViewHolder holder, User user) {
 
-                holder.setText(R.id.user_name, s.substring(1, s.length() - 1));
-                Bitmap bitmap = ImgConfig.showHeadImg(s.substring(1, s.length() - 1));
+                holder.setText(R.id.user_name, user.username);
+                holder.setText(R.id.user_nickname, user.nickname);
+                Bitmap bitmap = ImgConfig.showHeadImg(user.username);
                 if (bitmap == null) {
                     holder.setImageResource(R.id.user_avatar, R.drawable.default_avatar);
                 } else {
@@ -84,7 +86,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onItemClick(ViewGroup parent, View view, Object o, int position) {
                 Intent intent = new Intent(SearchActivity.this, UserActivity.class);
-                intent.putExtra("user_name", list.get(position).substring(1, list.get(position).length() - 1));
+                intent.putExtra("user", list.get(position));
                 startActivity(intent);
 
             }
@@ -120,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             protected void result(Object object) {//数据填充
-                List<String> listUser = (List<String>) object;
+                List<User> listUser = (List<User>) object;
                 list.clear();
                 list.addAll(listUser);
                 adapter.notifyDataSetChanged();
