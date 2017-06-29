@@ -4,12 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 
-public abstract class XmppLoadThread {
+/**
+ * 异步加载线程（工具类）
+ */
+public abstract class XMPPLoadThread {
 
     private Context mContext;
 
     @SuppressLint("NewApi")
-    public XmppLoadThread(Context context) {
+    public XMPPLoadThread(Context context) {
         mContext = context;
         new AsyncTask<Void, Integer, Object>() {
 

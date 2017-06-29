@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2017/6/26.
- * 描述：
+ * 描述：万能设配器
  */
 
 public abstract class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
@@ -46,16 +46,16 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> 
                 }
             }
         });
-        holder.getConvertView().setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (mOnItemClickListener != null) {
-                    int position = getPosition(holder);
-                    return mOnItemClickListener.onItemLongClick(parent, v, mDatas.get(position), position);
-                }
-                return false;
-            }
-        });
+//        holder.getConvertView().setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (mOnItemClickListener != null) {
+//                    int position = getPosition(holder);
+//                    return mOnItemClickListener.onItemLongClick(parent, v, mDatas.get(position), position);
+//                }
+//                return false;
+//            }
+//        });
     }
 
     private int getPosition(ViewHolder holder) {

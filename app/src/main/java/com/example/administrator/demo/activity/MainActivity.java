@@ -1,6 +1,5 @@
 package com.example.administrator.demo.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -12,9 +11,16 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.example.administrator.demo.R;
+import com.example.administrator.demo.anyevent.UserEvent;
 import com.example.administrator.demo.fragment.ChartFragment;
 import com.example.administrator.demo.fragment.ContentFragment;
 import com.example.administrator.demo.fragment.FoundFragment;
+import com.example.administrator.demo.utils.CustomPopWindow;
+import com.example.administrator.demo.utils.LogUtil;
+import com.example.administrator.demo.utils.XMPPConnUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,36 +36,34 @@ public class MainActivity extends AppCompatActivity {
     ImageView btnSearch;
     @BindView(R.id.btn_add_friend)
     ImageView btnAddFriend;
-    @BindView(R.id.btn_menu)
-    ImageView btnMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        //初始化页面
         vpViewpager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         tlTabs.setupWithViewPager(vpViewpager);
+        EventBus.getDefault().register(this);
 
     }
 
-    @OnClick({R.id.btn_search, R.id.btn_add_friend, R.id.btn_menu})
+    @OnClick({R.id.btn_search, R.id.btn_add_friend})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_search:
                 break;
-            case R.id.btn_add_friend:
-                Intent intent = new Intent(this, SearchActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.btn_menu:
+            case R.id.btn_add_friend://好友添加页面
+                new CustomPopWindow(this).show(btnAddFriend);
                 break;
         }
     }
 
+    //viewPager的适配器
     class ViewPagerAdapter extends FragmentPagerAdapter {
         int pagecount = 3;
-        String[] tabbName = {"聊天", "通讯录", "发现"};
+        String[] tabbName = {"聊天", "人气", "通讯录"};
 
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -72,11 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
                 return ChartFragment.newInstance("", "");
             } else if (position == 1) {
+                return FoundFragment.newInstance("", "");
+            } else if (position == 2) {
                 return ContentFragment.newInstance("", "");
 
-            } else if (position == 2) {
-
-                return FoundFragment.newInstance("", "");
             } else {
                 return null;
             }
@@ -93,5 +96,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Subscribe
+    public void EventMessage(UserEvent userEvent) {
 
+        LogUtil.d("onResponse", userEvent.msg);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //关闭Xmpp的连接
+        XMPPConnUtils.getInstance().closeConnection();
+        EventBus.getDefault().unregister(this);
+    }
 }

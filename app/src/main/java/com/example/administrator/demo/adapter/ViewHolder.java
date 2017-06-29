@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide;
 
 /**
  * Created by Administrator on 2017/6/26.
- * 描述：
+ * 描述：RecyclerView 的ViewHolder item 的事件都可以在这里自定义
  */
 
 public class ViewHolder extends RecyclerView.ViewHolder {
@@ -155,7 +155,6 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         view.setTextColor(mContext.getResources().getColor(textColorRes));
         return this;
     }
-
 
 
     public ViewHolder setVisible(int viewId, boolean visible) {

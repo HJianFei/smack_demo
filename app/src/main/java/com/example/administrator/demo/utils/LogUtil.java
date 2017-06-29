@@ -7,6 +7,8 @@ import java.util.Date;
 
 /**
  * Created by Administrator on 2017/6/19.
+ *
+ * 描述：日志输出工具类
  */
 
 public class LogUtil {

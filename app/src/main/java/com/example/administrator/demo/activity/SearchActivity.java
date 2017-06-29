@@ -1,5 +1,7 @@
 package com.example.administrator.demo.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -8,15 +10,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.administrator.demo.R;
 import com.example.administrator.demo.adapter.CommonAdapter;
+import com.example.administrator.demo.adapter.OnItemClickListener;
 import com.example.administrator.demo.adapter.ViewHolder;
+import com.example.administrator.demo.utils.ImgConfig;
 import com.example.administrator.demo.utils.ToastUtils;
-import com.example.administrator.demo.utils.XmppConnectionUtils;
-import com.example.administrator.demo.utils.XmppLoadThread;
+import com.example.administrator.demo.utils.XMPPConnUtils;
+import com.example.administrator.demo.utils.XMPPLoadThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +55,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        //初始化ToolBar
         toolbar.setTitle("添加好友");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -59,13 +65,31 @@ public class SearchActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        //设配器
         adapter = new CommonAdapter<String>(this, R.layout.search_user_item_layout, list) {
             @Override
             public void setData(ViewHolder holder, String s) {
 
-                holder.setText(R.id.user_name, s);
+                holder.setText(R.id.user_name, s.substring(1, s.length() - 1));
+                Bitmap bitmap = ImgConfig.showHeadImg(s.substring(1, s.length() - 1));
+                if (bitmap == null) {
+                    holder.setImageResource(R.id.user_avatar, R.drawable.default_avatar);
+                } else {
+                    holder.setImageBitmap(R.id.user_avatar, bitmap);
+                }
             }
         };
+        //item的点击事件
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(ViewGroup parent, View view, Object o, int position) {
+                Intent intent = new Intent(SearchActivity.this, UserActivity.class);
+                intent.putExtra("user_name", list.get(position).substring(1, list.get(position).length() - 1));
+                startActivity(intent);
+
+            }
+        });
+
         reSearchResult.setLayoutManager(new LinearLayoutManager(this));
         reSearchResult.setAdapter(adapter);
     }
@@ -76,20 +100,26 @@ public class SearchActivity extends AppCompatActivity {
             ToastUtils.showMessage(this, "名称不能为空");
             return;
         }
+        //查询用户
         loadData(searchTip.getText().toString());
 
     }
 
+    /**
+     * 查询用户
+     *
+     * @param tip
+     */
     private void loadData(final String tip) {
-        new XmppLoadThread(this) {
+        new XMPPLoadThread(this) {
 
             @Override
-            protected Object load() {
-                return XmppConnectionUtils.getInstance().searchUser(tip);
+            protected Object load() {//查询用户
+                return XMPPConnUtils.getInstance().searchUser(tip);
             }
 
             @Override
-            protected void result(Object object) {
+            protected void result(Object object) {//数据填充
                 List<String> listUser = (List<String>) object;
                 list.clear();
                 list.addAll(listUser);

@@ -6,6 +6,8 @@
     android:orientation="vertical"
     tools:context="com.example.administrator.demo.activity.LoginActivity">
 
+    <include layout="@layout/default_toolbar" />
+
     <EditText
         android:id="@+id/login_id"
         android:layout_width="match_parent"

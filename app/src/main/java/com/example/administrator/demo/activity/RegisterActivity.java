@@ -2,14 +2,16 @@ package com.example.administrator.demo.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.administrator.demo.R;
 import com.example.administrator.demo.utils.ToastUtils;
-import com.example.administrator.demo.utils.XmppConnectionUtils;
-import com.example.administrator.demo.utils.XmppLoadThread;
+import com.example.administrator.demo.utils.XMPPConnUtils;
+import com.example.administrator.demo.utils.XMPPLoadThread;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,12 +25,32 @@ public class RegisterActivity extends AppCompatActivity {
     EditText userPwd;
     @BindView(R.id.btn_register)
     Button btnRegister;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
+        //页面初始化
+        initView();
+    }
+
+    /**
+     * 页面初始化
+     */
+    private void initView() {
+        //初始化ToolBar
+        toolbar.setTitle("用户注册");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     @OnClick(R.id.btn_register)
@@ -45,17 +67,17 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerAction(final String userName, final String userPwd) {
-        new XmppLoadThread(this) {
+        new XMPPLoadThread(this) {
 
             @Override
-            protected Object load() {
-                return XmppConnectionUtils.getInstance().register(userName, userPwd);
+            protected Object load() {//用户注册逻辑
+                return XMPPConnUtils.getInstance().register(userName, userPwd);
             }
 
             @Override
             protected void result(Object object) {
-                boolean isSucccess = (boolean) object;
-                if (isSucccess) {
+                boolean isSuccess = (boolean) object;
+                if (isSuccess) {
                     ToastUtils.showMessage(RegisterActivity.this, "注册成功");
                     finish();
                 } else {

@@ -7,6 +7,8 @@ import android.widget.Toast;
 
 /**
  * Created by Administrator on 2017/6/19.
+ * <p>
+ * 描述：Toast 工具类
  */
 
 public class ToastUtils {
@@ -20,8 +22,6 @@ public class ToastUtils {
      *
      * @param act
      * @param msg
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:13:10
      */
     public static void showMessage(final Context act, final String msg) {
         showMessage(act, msg, Toast.LENGTH_SHORT);
@@ -32,8 +32,6 @@ public class ToastUtils {
      *
      * @param act
      * @param msg
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:13:10
      */
     public static void showMessageLong(final Context act, final String msg) {
         showMessage(act, msg, Toast.LENGTH_LONG);
@@ -44,8 +42,6 @@ public class ToastUtils {
      *
      * @param act
      * @param msg
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:13:35
      */
     public static void showMessage(final Context act, final int msg) {
         showMessage(act, msg, Toast.LENGTH_SHORT);
@@ -56,8 +52,6 @@ public class ToastUtils {
      *
      * @param act
      * @param msg
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:13:35
      */
     public static void showMessageLong(final Context act, final int msg) {
         showMessage(act, msg, Toast.LENGTH_LONG);
@@ -69,8 +63,6 @@ public class ToastUtils {
      * @param act
      * @param msg
      * @param len
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:14:09
      */
     public static void showMessage(final Context act, final int msg,
                                    final int len) {
@@ -102,8 +94,6 @@ public class ToastUtils {
      * @param act
      * @param msg
      * @param len
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:14:27
      */
     public static void showMessage(final Context act, final String msg,
                                    final int len) {
@@ -131,9 +121,6 @@ public class ToastUtils {
 
     /**
      * 关闭当前Toast
-     *
-     * @author WikerYong   Email:<a href="#">yw_312@foxmail.com</a>
-     * @version 2012-5-22 上午11:14:45
      */
     public static void cancelCurrentToast() {
         if (toast != null) {
